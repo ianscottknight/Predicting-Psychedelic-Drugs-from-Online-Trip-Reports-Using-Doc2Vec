@@ -1,0 +1,9 @@
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+data/.DS_Store
+data/custom_stop_words.pickle
+data/drug_to_dosechart_info_dict.pickle
+data/drug_to_effects_dict.pickle
+data/drug_to_trip_reports_dict.pickle
+data/trip_reports.csv
