@@ -36,7 +36,7 @@ DRUG_TO_EFFECTS_DICT_FILE = f"{DATA_DIR}/drug_to_effects_dict.pickle"
 
 TRIP_REPORTS_FILE = f"{DATA_DIR}/trip_reports.csv"
 
-CUSTOM_STOP_WORDS_FILE = f"{DATA_DIR}/custom_stop_words.pickle"
+CUSTOM_STOP_WORDS_FILE = f"{DATA_DIR}/custom_stop_words.txt"
 
 
 

@@ -303,7 +303,7 @@ def get_erowid_trip_reports(drug):
     return trip_reports
 
 
-def get_custom_stop_words():
+def get_drug_words_from_psychonaut_wiki():
 
     # a few names included were found to not bias their corresponding drug, so we make exceptions for them manually
     NAME_EXCEPTIONS = [
@@ -315,7 +315,8 @@ def get_custom_stop_words():
         "rosy"
     ]
 
-    custom_stop_words = []
+    drug_words = []
+
     for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]:
 
         # retrieve text containing the various names of the given drug
@@ -348,42 +349,24 @@ def get_custom_stop_words():
         names += [name.replace("-", "") for name in names]
 
         # add to custom stop words
-        custom_stop_words += names
+        drug_words += names
+
+    return drug_words
+
+def augment_custom_stop_words():
+
+    custom_stop_words = []
+    with open(util.CUSTOM_STOP_WORDS_FILE) as f:
+        custom_stop_words = f.readlines()
+
+    custom_stop_words = [w.strip() for w in custom_stop_words] 
+
+    # add drug words from psychonaut wiki
+    custom_stop_words += get_drug_words_from_psychonaut_wiki()
 
     # add names in text files:
     custom_stop_words += [drug.lower().replace("_", " ") for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]]
     custom_stop_words += [drug.lower().replace("_", " ") for drug in util.PSYCHEDELICS["erowid_id"]]
-
-    # add all others, including methods of consumption, paraphernalia, measurements, and classes of drugs
-    custom_stop_words += [
-        "mushroom", "fungus", "fungi", "shroom", "cubensis", "cactus", "cacti", "san", "pedro", "peyote", \
-        "divinorum", "mpt", "mde", "mdma", "mdmc", "mda", "mxe", "mdpv", "eth", "lad", "molly", \
-        "ghb", "bufo", "alverius", "melatonin", "flunitrazepam", "alpraolam", "xanax", "woodrose", \
-        "l-amphetamine", "hostilis", "diphenhydramine", "mdpr", "br-dfly", "clonazolam", "clonazepam", \
-        "etizolam", "argyreia", "nervosa", "conocybe", "copelandia", "galerina", "gymnopilus", "inocybe", \
-        "panaeolus", "pholiotina", "pluteus", "psilocybe", "serotonin", "serotonergic", "dopamine", \
-        "dopaminergic", "norepinephrine", "adrenergic", "enpathogen", "empathogenic", "entactogen", \
-        "entactogenic", "entheogen", "entheogenic", "tab", "pipe", "smoked", "swallowed", "dropped", \
-        "insufflated", "insufflation", "vaporized", "bong", "bubbler", "hitter", "inhaled", "exhaled", \
-        "inhaling", "exhaling", "oral", "orally", "sublingual", "sub-lingual", "intramuscular", "injected", \
-        "injection", "gram", "g", "milligram", "mg", "microgram", "µg", "mcg", "microg", "mmhg", \
-        "milliliter", "ml", "freebase", "fumarate", "indole", "substituted", "lysergic", "lysergamide", \
-        "tryptamine", "phenethylamine", "phen", "phenthylamine", "dimethyltryptamine", "dox", "do-x", \
-        "nbome", "salvinorin", "salvorin", "amphetamine", "dexedrine", "b", "c", "d", "e", "j", "m", "p", "t", \
-        "peruvianus", "hydrobromide", "kappa", "opioid", "nasal", "nasally", "buccal", "buccally", "rectal", \
-        "rectally", "pcp", "hydrochloride", "foxie", "insuflated", "intranasal", "tscpn", "toke", "ipracetyl", \
-        "ketamine", "ket", "k", "snort", "snorting", "erowid", "gland", "brew", "tea", "pill", "capsule", \
-        "inhale", "inhaling", "exhale", "exhaling", "r", "redose", "dose", "extract", "shrooming", "syrian", \
-        "rue", "methylone", "comeup", "come-up", "glory", "seed", "xtc", "insufflate", "vapor", "vaporize", \
-        "hcl", "caapi", "datura", "oxide", "harmala", "alkaloid", "cocaine", "coke", "meth", "cannabis", \
-        "weed", "joint", "smoke", "sublingually", "sub-lingually", "lingual", "lingually", "come-down", \
-        "comedown", "aluminum", "foil", "boil", "extracted", "extraction", "toke", "syringe", "inject", \
-        "methamphetamine", "magnesium", "ssri", "marijuana", "amp", "tar", "nostril", "dropper", "codine", \
-        "ayahuasca", "dxm", "mush", "mushie", "ug", "nose", "inhalation", "exhalation", "eighth", "truffle", \
-        "harmaline", "spore", "gelcap", "memantine", "alprazolam", "aco", "meo", "drop", "research", "chemical", \
-        "rc", "hit", "smoking", "swallow", "powder", "free-base", "salt", "eyeball", "eyeballed", "eyeballing", \
-        "fume", "bromo", "lime", "juice", "ingest"
-    ]
 
     # add versions of stop words with prefixes and suffixes
     additions = []
@@ -397,7 +380,7 @@ def get_custom_stop_words():
     custom_stop_words += [w + 's' for w in custom_stop_words]
 
     # reduce to unique elements
-    custom_stop_words = list(set(custom_stop_words))
+    custom_stop_words = set(custom_stop_words)
 
     return custom_stop_words
 
@@ -429,9 +412,6 @@ def main():
             pickle.dump(drug_to_effects_dict, f)
 
         erowid_drugs_to_scrape = util.PSYCHEDELICS["erowid_id"][:24]
-
-        # Scrape custom stop words (words pertaining to specific drugs) for later use
-        custom_stop_words = get_custom_stop_words()
 
         # Save custom stop words
         with open(util.CUSTOM_STOP_WORDS_FILE, "wb") as f:
