@@ -355,18 +355,11 @@ def get_drug_words_from_psychonaut_wiki():
 
 def augment_custom_stop_words():
 
+    # load custom stop words from file
     custom_stop_words = []
     with open(util.CUSTOM_STOP_WORDS_FILE) as f:
         custom_stop_words = f.readlines()
-
     custom_stop_words = [w.strip() for w in custom_stop_words] 
-
-    # add drug words from psychonaut wiki
-    custom_stop_words += get_drug_words_from_psychonaut_wiki()
-
-    # add names in text files:
-    custom_stop_words += [drug.lower().replace("_", " ") for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]]
-    custom_stop_words += [drug.lower().replace("_", " ") for drug in util.PSYCHEDELICS["erowid_id"]]
 
     # add versions of stop words with prefixes and suffixes
     additions = []
