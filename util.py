@@ -40,9 +40,13 @@ CUSTOM_STOP_WORDS_FILE = f"{DATA_DIR}/custom_stop_words.txt"
 
 TRIP_REPORTS_DATAFRAME_FILE = f"{DATA_DIR}/trip_reports_dataframe.pickle"
 
-DOC2VEC_MODEL_FILE = f"{DATA_DIR}/doc2vec_model.pickle"
+DOC2VEC_MODEL_DBOW_FILE = f"{DATA_DIR}/doc2vec_model_dbow.pickle"
+DOC2VEC_MODEL_DM_FILE = f"{DATA_DIR}/doc2vec_model_dm.pickle"
 
-DOC2VEC_HYPERPARAMETERS_FILE = f"{DATA_DIR}/doc2vec_hyperparameters.txt"
+DOC2VEC_HYPERPARAMETERS_DBOW_FILE = f"{DATA_DIR}/doc2vec_hyperparameters_dbow.pickle"
+DOC2VEC_HYPERPARAMETERS_DM_FILE = f"{DATA_DIR}/doc2vec_hyperparameters_dm.pickle"
+
+CLASSIFIER_FILE = f"{DATA_DIR}/classifier.pickle"
 
 
 
