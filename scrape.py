@@ -13,7 +13,6 @@ import langdetect
 import pandas as pd
 
 
-
 """
 Constants
 """
@@ -165,10 +164,10 @@ def get_duration_dict(dosechart):
 Get dosechart info from Psychonaut Wiki 
 """
 
-def get_drug_to_dosechart_info_dict():
+def get_drug_to_dosechart_info_dict(psychonaut_wiki_ids):
     print("Getting drug dosechart info from Psychonaut Wiki...")
     drug_to_dosechart_info_dict = {}
-    for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]:
+    for drug in psychonaut_wiki_ids:
         print(f"\tDrug: {drug}")
         soup = get_psychonaut_wiki_general_drug_soup(drug)
         dosecharts = soup.find_all(class_="dosechart")
@@ -204,7 +203,7 @@ def get_drug_to_dosechart_info_dict():
 """
 Get drug effects from Psychonaut Wiki 
 """
-def get_drug_to_effects_dict():
+def get_drug_to_effects_dict(psychonaut_wiki_ids):
     drug_to_effects_dict = {}
 
     effects_list_url = "https://psychonautwiki.org/wiki/List/effects"
@@ -240,7 +239,7 @@ def get_drug_to_effects_dict():
     all_effect_refs = list(set(all_effect_refs))
 
     print("Getting drug effects from Psychonaut Wiki...")
-    for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]:
+    for drug in psychonaut_wiki_ids:
         print(f"\tDrug: {drug}")
         soup = get_psychonaut_wiki_summary_drug_soup(drug)
         effects = []
@@ -303,7 +302,7 @@ def get_erowid_trip_reports(drug):
     return trip_reports
 
 
-def get_drug_words_from_psychonaut_wiki():
+def get_drug_words_from_psychonaut_wiki(psychonaut_wiki_ids):
 
     # a few names included were found to not bias their corresponding drug, so we make exceptions for them manually
     NAME_EXCEPTIONS = [
@@ -317,7 +316,7 @@ def get_drug_words_from_psychonaut_wiki():
 
     drug_words = []
 
-    for drug in util.PSYCHEDELICS["psychonaut_wiki_id"]:
+    for drug in psychonaut_wiki_ids:
 
         # retrieve text containing the various names of the given drug
         base_url = "https://psychonautwiki.org/wiki/"
@@ -353,13 +352,7 @@ def get_drug_words_from_psychonaut_wiki():
 
     return drug_words
 
-def augment_custom_stop_words():
-
-    # load custom stop words from file
-    custom_stop_words = []
-    with open(util.CUSTOM_STOP_WORDS_FILE) as f:
-        custom_stop_words = f.readlines()
-    custom_stop_words = [w.strip() for w in custom_stop_words] 
+def augment_custom_stop_words(custom_stop_words): 
 
     # add versions of stop words with prefixes and suffixes
     additions = []
@@ -388,31 +381,28 @@ def main():
 
     assert PHASE == 1 or PHASE == 2
 
+    PSYCHEDELICS = util.read_psychedelics_file()
+
     if PHASE == 1:
 
         # Scrape drug dosechart info from Psychonaut Wiki
-        drug_to_dosechart_info_dict = get_drug_to_dosechart_info_dict()
+        drug_to_dosechart_info_dict = get_drug_to_dosechart_info_dict(PSYCHEDELICS["psychonaut_wiki_id"])
 
         # Save drug dosechart info
         with open(util.DRUG_TO_DOSECHART_INFO_DICT_FILE, "wb") as f:
             pickle.dump(drug_to_dosechart_info_dict, f)
 
         # Scrape drug effects from Psychonaut Wiki
-        drug_to_effects_dict = get_drug_to_effects_dict()
+        drug_to_effects_dict = get_drug_to_effects_dict(PSYCHEDELICS["psychonaut_wiki_id"])
 
         # Save drug effects
         with open(util.DRUG_TO_EFFECTS_DICT_FILE, "wb") as f:
             pickle.dump(drug_to_effects_dict, f)
 
-        erowid_drugs_to_scrape = util.PSYCHEDELICS["erowid_id"][:24]
-
-        # Save custom stop words
-        with open(util.CUSTOM_STOP_WORDS_FILE, "wb") as f:
-            pickle.dump(custom_stop_words, f)
-
+        erowid_drugs_to_scrape = PSYCHEDELICS["erowid_id"][:24]
 
     else:
-        erowid_drugs_to_scrape = util.PSYCHEDELICS["erowid_id"][24:]
+        erowid_drugs_to_scrape = PSYCHEDELICS["erowid_id"][24:]
     
 
     # Scrape trip reports from Erowid

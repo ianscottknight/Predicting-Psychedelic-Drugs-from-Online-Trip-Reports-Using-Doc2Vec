@@ -3,3 +3,5 @@
 __pycache__/
 data/.DS_Store
 data/trip_reports_dataframe.pickle
+data/doc2vec_model_dbow.pickle
+data/doc2vec_model_dm.pickle
